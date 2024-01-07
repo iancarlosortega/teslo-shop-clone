@@ -1,7 +1,11 @@
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ProductSlideshow, QuantitySelector, SizeSelector } from '@/components';
 import { titleFont } from '@/config/fonts';
-import { initialData } from '@/seed/seed';
+import { getProductBySlug } from '@/actions';
+import { ProductSlideshow } from '@/components';
+import { AddToCart } from './ui/AddToCart';
+
+export const revalidate = '604800'; // 1 week
 
 interface Props {
 	params: {
@@ -9,15 +13,26 @@ interface Props {
 	};
 }
 
-const getProductBySlug = (slug: string) => {
-	const product = initialData.products.find(product => product.slug === slug);
-	return product;
-};
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const slug = params.slug;
 
-export default function ProductPage({ params }: Props) {
+	const product = await getProductBySlug(slug);
+
+	return {
+		title: product?.title ?? 'Producto no encontrado',
+		description: product?.description ?? '',
+		openGraph: {
+			title: product?.title ?? 'Producto no encontrado',
+			description: product?.description ?? '',
+			images: [`/products/${product?.images[1]}`],
+		},
+	};
+}
+
+export default async function ProductPage({ params }: Props) {
 	const { slug } = params;
 
-	const product = getProductBySlug(slug);
+	const product = await getProductBySlug(slug);
 
 	if (!product) return notFound();
 
@@ -35,15 +50,7 @@ export default function ProductPage({ params }: Props) {
 				</h1>
 				<p className='text-lg mb-5'>${product.price}</p>
 
-				{/* Sizes selector */}
-				<SizeSelector
-					selectedSize={product.sizes[0]}
-					availableSizes={product.sizes}
-				/>
-				{/* Quantity selector */}
-				<QuantitySelector quantity={1} maxQuantity={product.inStock} />
-
-				<button className='btn-primary my-5'>Agregar al carrito</button>
+				<AddToCart product={product} />
 
 				<h3 className='font-bold text-sm'>Descripción</h3>
 				<p className='font-light'>{product.description}</p>

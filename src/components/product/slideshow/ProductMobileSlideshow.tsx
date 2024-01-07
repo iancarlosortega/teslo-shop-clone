@@ -18,28 +18,29 @@ interface Props {
 
 export const ProductMobileSlideshow = ({ images, title }: Props) => {
 	return (
-		<Swiper
-			style={{
-				width: '100vw',
-				height: '500px',
-			}}
-			pagination={true}
-			autoplay={{
-				delay: 2500,
-			}}
-			modules={[FreeMode, Pagination, Autoplay]}
-			className='mySwiper2'>
-			{images.map(image => (
-				<SwiperSlide key={image}>
-					<Image
-						src={`/products/${image}`}
-						alt={title}
-						width={600}
-						height={500}
-						className='object-fill'
-					/>
-				</SwiperSlide>
-			))}
-		</Swiper>
+		<div className='md:hidden'>
+			<Swiper
+				style={{
+					width: '100vw',
+					height: '500px',
+				}}
+				pagination={true}
+				autoplay={{
+					delay: 2500,
+				}}
+				modules={[FreeMode, Pagination, Autoplay]}>
+				{images.map(image => (
+					<SwiperSlide key={image}>
+						<Image
+							src={`/products/${image}`}
+							alt={title}
+							width={600}
+							height={500}
+							className='object-fill'
+						/>
+					</SwiperSlide>
+				))}
+			</Swiper>
+		</div>
 	);
 };

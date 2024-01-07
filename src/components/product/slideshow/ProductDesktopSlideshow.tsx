@@ -24,7 +24,7 @@ export const ProductDesktopSlideshow = ({ images, title }: Props) => {
 	const [thumbsSwiper, setThumbsSwiper] = useState<SwiperObject>();
 
 	return (
-		<>
+		<div className='hidden md:block'>
 			<Swiper
 				style={
 					{
@@ -73,6 +73,6 @@ export const ProductDesktopSlideshow = ({ images, title }: Props) => {
 					</SwiperSlide>
 				))}
 			</Swiper>
-		</>
+		</div>
 	);
 };
