@@ -1,5 +1,6 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
 import {
 	IoCloseOutline,
 	IoLogInOutline,
@@ -10,13 +11,18 @@ import {
 	IoShirtOutline,
 	IoTicketOutline,
 } from 'react-icons/io5';
-import { useUIStore } from '@/store';
-import { MenuItemLink } from './MenuItemLink';
 import clsx from 'clsx';
+import { useUIStore } from '@/store';
+import { logout } from '@/actions';
+import { MenuItemLink } from './MenuItemLink';
 
 export const Sidebar = () => {
 	const isSideMenuOpen = useUIStore(state => state.isSideMenuOpen);
 	const closeSideMenu = useUIStore(state => state.closeSideMenu);
+
+	const { data: session } = useSession();
+	const isAuthenticated = Boolean(session?.user);
+	const isAdmin = session?.user.roles.includes('admin');
 
 	return (
 		<div>
@@ -57,47 +63,57 @@ export const Sidebar = () => {
 				</div>
 
 				{/* Menu */}
-				<MenuItemLink
-					url='/'
-					icon={<IoPersonOutline size={30} />}
-					text='Perfil'
-				/>
-				<MenuItemLink
-					url='/'
-					icon={<IoTicketOutline size={30} />}
-					text='Órdenes'
-				/>
-				<MenuItemLink
-					url='/'
-					icon={<IoLogInOutline size={30} />}
-					text='Ingresar'
-				/>
-				<MenuItemLink
-					url='/'
-					icon={<IoLogOutOutline size={30} />}
-					text='Salir'
-				/>
+				{isAuthenticated ? (
+					<>
+						<MenuItemLink
+							url='/profile'
+							icon={<IoPersonOutline size={30} />}
+							text='Perfil'
+						/>
+						<MenuItemLink
+							url='/'
+							icon={<IoTicketOutline size={30} />}
+							text='Órdenes'
+						/>
+						<button
+							onClick={() => logout()}
+							className='w-full flex items-center mt-10 p-2 hover:bg-gray-100 rounded transiton-all'>
+							<IoLogOutOutline size={30} />
+							<span className='ml-3 text-xl'>Salir</span>
+						</button>
+					</>
+				) : (
+					<MenuItemLink
+						url='/auth/login'
+						icon={<IoLogInOutline size={30} />}
+						text='Ingresar'
+					/>
+				)}
 
 				{/* Divider */}
-				<div className='w-full h-px bg-gray-200 my-10 rounded' />
 
-				{/* Menu */}
-				<MenuItemLink
-					url='/'
-					icon={<IoShirtOutline size={30} />}
-					text='Productos'
-				/>
-				<MenuItemLink
-					url='/'
-					icon={<IoTicketOutline size={30} />}
-					text='Órdenes'
-				/>
+				{/* Admin Options */}
+				{isAdmin && (
+					<>
+						<div className='w-full h-px bg-gray-200 my-10 rounded' />
+						<MenuItemLink
+							url='/'
+							icon={<IoShirtOutline size={30} />}
+							text='Productos'
+						/>
+						<MenuItemLink
+							url='/'
+							icon={<IoTicketOutline size={30} />}
+							text='Órdenes'
+						/>
 
-				<MenuItemLink
-					url='/'
-					icon={<IoPeopleOutline size={30} />}
-					text='Usuarios'
-				/>
+						<MenuItemLink
+							url='/'
+							icon={<IoPeopleOutline size={30} />}
+							text='Usuarios'
+						/>
+					</>
+				)}
 			</nav>
 		</div>
 	);
